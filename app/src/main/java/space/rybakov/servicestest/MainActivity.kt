@@ -2,7 +2,9 @@ package space.rybakov.servicestest
 
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
+import android.app.job.JobWorkItem
 import android.content.ComponentName
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -39,14 +41,16 @@ class MainActivity : AppCompatActivity() {
             val componentName = ComponentName(this, MyJobService::class.java)
 
             val jobInfo = JobInfo.Builder(MyJobService.JOB_ID, componentName)
-                .setExtras(MyJobService.newBundle(page++))
                 .setRequiresCharging(true) // только для зарежающихся
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED) // по вайфаю
-                .setPersisted(true) // для запуска после включения устройства
                 .build()
 
             val jobScheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
-            jobScheduler.schedule(jobInfo)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val intent = MyJobService.newIntent(page++)
+                jobScheduler.enqueue(jobInfo, JobWorkItem(intent))
+            }
         }
     }
 }
