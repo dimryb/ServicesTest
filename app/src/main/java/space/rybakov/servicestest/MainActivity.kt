@@ -14,6 +14,8 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
+    private var page = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -37,6 +39,7 @@ class MainActivity : AppCompatActivity() {
             val componentName = ComponentName(this, MyJobService::class.java)
 
             val jobInfo = JobInfo.Builder(MyJobService.JOB_ID, componentName)
+                .setExtras(MyJobService.newBundle(page++))
                 .setRequiresCharging(true) // только для зарежающихся
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED) // по вайфаю
                 .setPersisted(true) // для запуска после включения устройства
